@@ -6,9 +6,8 @@ ScreenShot::ScreenShot()
 {
     ui->setupUi(this);
     tray = new QSystemTrayIcon;
-    icon.addFile(":/new/prefix1/C:/Users/Mercer/Desktop/1468956197_Screenshot.ico");
+    icon.addFile(":/new/prefix1/C:/Users/Mercer/Desktop/1468956197_Screenshot.ico");    
     tray->setIcon(icon);
-    tray->setToolTip("Ready to shot");
     tray->show();
 
     creatActions();
@@ -86,8 +85,7 @@ void ScreenShot::mouseReleaseEvent(QMouseEvent *e)
 
         if(e->button()==Qt::LeftButton)
         {
-            end = e->pos();//记录终点坐标
-            grabScreen();
+            end = e->pos();//记录终点坐标  
         }
         else if(e->button()==Qt::RightButton)
         {
@@ -143,15 +141,12 @@ void ScreenShot::setLabel(int w,int h,int x,int y)
 void ScreenShot::creatActions()
 {
     quitAction = new QAction("Quit",this);
-    connect(quitAction,SIGNAL(triggered()),qApp,SLOT(quit()));
-    aboutAction = new QAction("About",this);
-    connect(aboutAction,SIGNAL(triggered()),this,SLOT(About()));
+    connect(quitAction,SIGNAL(triggered()),qApp,SLOT(quit())); 
 }
 
 void ScreenShot::creatMenu()
 {
     trayIconMenu = new QMenu(this);
-    trayIconMenu->addAction(aboutAction);
     trayIconMenu->addAction(quitAction);
     tray->setContextMenu(trayIconMenu);
 }
@@ -160,14 +155,9 @@ void ScreenShot::iconActivied(QSystemTrayIcon::ActivationReason reason)
 {
     switch(reason)
     {
-    case QSystemTrayIcon::Trigger: Shot();setBackground(width,height);break;
-    default:break;
+        case QSystemTrayIcon::Trigger: Shot();setBackground(width,height);break;
+        default:break;
     }
-}
-
-void ScreenShot::About()
-{
-    QMessageBox::about(this,"About","this application is for screen shortcut");
 }
 
 void ScreenShot::Shot()

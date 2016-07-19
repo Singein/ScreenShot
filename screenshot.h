@@ -60,7 +60,6 @@ private:
     void pSize();
 public slots:
     void Shot();
-    void About();
     void iconActivied(QSystemTrayIcon::ActivationReason reason);
 
 };
