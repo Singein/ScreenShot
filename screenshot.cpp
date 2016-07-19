@@ -12,6 +12,11 @@ ScreenShot::ScreenShot()
     this ->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
 
     setBackground(width,height);
+    rubber =  NULL;
+    origin = end = QPoint(0,0);
+    label = new QLabel("");
+    label->setWindowFlags(Qt::FramelessWindowHint);
+
 
 }
 
@@ -48,7 +53,24 @@ void ScreenShot::grabScreen()
 void ScreenShot::setBackground(int w, int h)
 {
     QScreen *screen = QGuiApplication::primaryScreen();
-    screen->grabWindow(0).save("bg.bmp","bmp");
+//    screen->grabWindow(0).save("bg.bmp","bmp");
+
+    int r,g,b;
+    bg = screen->grabWindow(0).toImage();
+    QImage bg_grey(w,h,QImage::Format_RGB32);
+    for(int i=0;i<w;i++)
+    {
+        for(int j=0;j<h;j++)
+        {
+            r = qRed(bg.pixel(i,j))*0.5;
+            g = qGreen(bg.pixel(i,j))*0.5;
+            b = qBlue(bg.pixel(i,j))*0.5;
+            bg_grey.setPixel(i,j,qRgb(r,g,b));
+        }
+    }
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(),QBrush(bg_grey));
+    this->setPalette(palette);
 }
 
 void ScreenShot::setLabel()

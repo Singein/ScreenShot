@@ -45,8 +45,8 @@ private:
     QRubberBand *rubber;
     QPoint origin;//鼠标起始位置
     QPoint end;//鼠标结束位置
-    QImage c_shot;//存贮当前桌面截图
-    QLabel label;//用来框选图片
+    QImage bg;//存贮当前桌面截图
+    QLabel *label;//用来框选图片
     int width;//屏幕宽度
     int height;//屏幕高度
     static ScreenShot* instance;
