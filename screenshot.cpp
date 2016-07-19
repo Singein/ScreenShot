@@ -105,10 +105,13 @@ void ScreenShot::setBackground(int w, int h)
 
 void ScreenShot::setLabel(int w,int h,int x,int y)
 {
-    QString size = QString("%1 x %2     ").arg(w).arg(h);
+    QString size = QString("%1 x %2      ").arg(w).arg(h);
     label->setText(size);
     QRect rect(label->contentsRect());
-    label->move(QPoint(x,y-rect.height()));
+    if(y>rect.height())
+        label->move(QPoint(x,y-rect.height()));
+    else
+        label->move(QPoint(x,y));
     label->show();
 }
 
