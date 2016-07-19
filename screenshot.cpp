@@ -11,13 +11,12 @@ ScreenShot::ScreenShot()
     this->resize(width,height);
     this ->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
 
+    finish = true;
     setBackground(width,height);
     rubber =  NULL;
     origin = end = QPoint(0,0);
     label = new QLabel("");
-    label->setWindowFlags(Qt::FramelessWindowHint);
-
-
+    label->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
 }
 
 ScreenShot::~ScreenShot()
@@ -28,20 +27,51 @@ ScreenShot::~ScreenShot()
 void ScreenShot::keyPressEvent(QKeyEvent *e)
 {
 
+
 }
 
 void ScreenShot::mousePressEvent(QMouseEvent *e)
 {
+    if(finish==true)
+    {
+        rubber = new  QRubberBand(QRubberBand::Rectangle,this);
+        rubber->show();
+        origin = e->pos();
+        rubber->setGeometry(origin.x(),origin.y(),0,0);
+        finish = false;
+    }
+}
+
+void ScreenShot::mouseMoveEvent(QMouseEvent *e)
+{
+    if(e->buttons() & Qt::LeftButton)
+    {
+        end = e->pos();
+        int w = abs(end.x()-origin.x());
+        int h = abs(end.y()-origin.y());
+        int x = origin.x()<end.x()?origin.x():end.x();
+        int y = origin.y()<end.y()?origin.y():end.y();
+        rubber->setGeometry(x,y,w,h);
+        setLabel(w,h,x,y);
+    }
 
 }
 
 void ScreenShot::mouseReleaseEvent(QMouseEvent *e)
 {
 
-}
+        if(e->button()==Qt::LeftButton)
+        {
+            end = e->pos();//记录终点坐标
+            grabScreen();
+        }
+        else if(e->button()==Qt::RightButton)
+        {
+            finish = true;
+            rubber->close();
+            label->close();
+        }
 
-void ScreenShot::mouseMoveEvent(QMouseEvent *e)
-{
 
 }
 
@@ -73,9 +103,13 @@ void ScreenShot::setBackground(int w, int h)
     this->setPalette(palette);
 }
 
-void ScreenShot::setLabel()
+void ScreenShot::setLabel(int w,int h,int x,int y)
 {
-
+    QString size = QString("%1 x %2     ").arg(w).arg(h);
+    label->setText(size);
+    QRect rect(label->contentsRect());
+    label->move(QPoint(x,y-rect.height()));
+    label->show();
 }
 
 void ScreenShot::show()

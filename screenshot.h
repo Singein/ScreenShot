@@ -36,7 +36,7 @@ public:
 
     void setBackground(int w,int h);
     void grabScreen();
-    void setLabel();
+    void setLabel(int w,int h,int x,int y);
 
     void show();
 
@@ -50,6 +50,7 @@ private:
     int width;//屏幕宽度
     int height;//屏幕高度
     static ScreenShot* instance;
+    bool finish;
     ScreenShot();
 
 };
