@@ -12,6 +12,8 @@
 #include <QSystemTrayIcon>
 #include <QKeyEvent>
 #include <QMenu>
+#include <QDir>
+#include <QDateTime>
 
 namespace Ui {
 class ScreenShot;
@@ -44,6 +46,7 @@ private:
     QLabel *label;//用来框选图片
     int width;//屏幕宽度
     int height;//屏幕高度
+    int pw,ph,px,py;
     static ScreenShot* instance;
     bool finish;
 
@@ -54,6 +57,7 @@ private:
 
     void creatActions();
     void creatMenu();
+    void pSize();
 public slots:
     void Shot();
     void About();

@@ -13,8 +13,8 @@ ScreenShot::ScreenShot()
 
     creatActions();
     creatMenu();
-
-    connect(tray,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(iconActivied(QSystemTrayIcon::ActivationReason)));
+    connect(tray,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+            this,SLOT(iconActivied(QSystemTrayIcon::ActivationReason)));
 }
 
 ScreenShot::~ScreenShot()
@@ -32,7 +32,7 @@ void ScreenShot::keyPressEvent(QKeyEvent *e)
 {
     if(e->modifiers()==Qt::AltModifier)
     {
-        if(e->key()==Qt::Key_Alt)
+        if(e->key()==Qt::Key_S)
         {
             Shot();
         }
@@ -40,6 +40,13 @@ void ScreenShot::keyPressEvent(QKeyEvent *e)
     if(e->key()==Qt::Key_Escape)
     {
         this->hide();
+    }
+    if(e->key()==Qt::Key_Enter)
+    {
+        if(pw*ph!=0)
+        {
+            grabScreen();
+        }
     }
 }
 
@@ -55,19 +62,23 @@ void ScreenShot::mousePressEvent(QMouseEvent *e)
     }
 }
 
+void ScreenShot::pSize()
+{
+    pw = abs(end.x()-origin.x());
+    ph = abs(end.y()-origin.y());
+    px = origin.x()<end.x()?origin.x():end.x();
+    py = origin.y()<end.y()?origin.y():end.y();
+}
+
 void ScreenShot::mouseMoveEvent(QMouseEvent *e)
 {
     if(e->buttons() & Qt::LeftButton)
     {
         end = e->pos();
-        int w = abs(end.x()-origin.x());
-        int h = abs(end.y()-origin.y());
-        int x = origin.x()<end.x()?origin.x():end.x();
-        int y = origin.y()<end.y()?origin.y():end.y();
-        rubber->setGeometry(x,y,w,h);
-        setLabel(w,h,x,y);
+        pSize();
+        rubber->setGeometry(px,py,pw,ph);
+        setLabel(pw,ph,px,py);
     }
-
 }
 
 void ScreenShot::mouseReleaseEvent(QMouseEvent *e)
@@ -88,7 +99,10 @@ void ScreenShot::mouseReleaseEvent(QMouseEvent *e)
 
 void ScreenShot::grabScreen()
 {
-
+    QImage pic = bg.copy(px,py,pw,ph);
+    QString path = QDir::currentPath()+"/"+QDateTime::currentDateTime().toString("yymmddhhmmss")+".jpg";
+    pic.save(path);
+    QDesktopServices::openUrl(QUrl(path));
 }
 
 void ScreenShot::setBackground(int w, int h)
