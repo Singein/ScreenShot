@@ -18,3 +18,6 @@ SOURCES += main.cpp\
 HEADERS  += screenshot.h
 
 FORMS    += screenshot.ui
+
+RESOURCES += \
+    src.qrc

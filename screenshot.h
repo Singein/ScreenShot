@@ -9,6 +9,8 @@
 #include <QDesktopWidget>
 #include <QDesktopServices>
 #include <QScreen>
+#include <QSystemTrayIcon>
+#include <QKeyEvent>
 
 namespace Ui {
 class ScreenShot;
@@ -20,15 +22,7 @@ class ScreenShot : public QWidget
 
 public:
     ~ScreenShot();
-    static ScreenShot *Instance()
-    {
-        if(!instance)
-            instance = new ScreenShot();
-
-        return instance;
-    }
-
-
+    ScreenShot();
     void mouseMoveEvent(QMouseEvent *e);
     void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
@@ -38,11 +32,11 @@ public:
     void grabScreen();
     void setLabel(int w,int h,int x,int y);
 
-    void show();
 
 private:
     Ui::ScreenShot *ui;
     QRubberBand *rubber;
+    QIcon icon;
     QPoint origin;//鼠标起始位置
     QPoint end;//鼠标结束位置
     QImage bg;//存贮当前桌面截图
@@ -51,7 +45,16 @@ private:
     int height;//屏幕高度
     static ScreenShot* instance;
     bool finish;
-    ScreenShot();
+
+    QSystemTrayIcon* tray;
+    QAction *quitAction;               //退出事件
+    QAction *setAction;                //设置事件
+    QMenu *trayIconMenu;               //托盘图标点击菜单
+
+    void creatActions();
+    void creatMenu();
+public slots:
+    void Shot();
 
 };
 

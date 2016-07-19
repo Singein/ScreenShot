@@ -1,22 +1,15 @@
 #include "screenshot.h"
 #include "ui_screenshot.h"
 
-ScreenShot* ScreenShot::instance = 0;
+
 ScreenShot::ScreenShot()
 {
-    QDesktopWidget *desktop = QApplication::desktop();
-    QRect deskRect = desktop->screenGeometry();
-    width = deskRect.width();
-    height = deskRect.height();
-    this->resize(width,height);
-    this ->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
-
-    finish = true;
-    setBackground(width,height);
-    rubber =  NULL;
-    origin = end = QPoint(0,0);
-    label = new QLabel("");
-    label->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
+    ui->setupUi(this);
+    tray = new QSystemTrayIcon;
+    icon.addFile(":/new/prefix1/C:/Users/Mercer/Desktop/1468956197_Screenshot.ico");
+    tray->setIcon(icon);
+    tray->setToolTip("Ready to shot");
+    tray->show();
 }
 
 ScreenShot::~ScreenShot()
@@ -26,7 +19,13 @@ ScreenShot::~ScreenShot()
 
 void ScreenShot::keyPressEvent(QKeyEvent *e)
 {
-
+    if(e->modifiers()==Qt::AltModifier)
+    {
+        if(e->key()==Qt::Key_Alt)
+        {
+            Shot();
+        }
+    }
 
 }
 
@@ -115,8 +114,30 @@ void ScreenShot::setLabel(int w,int h,int x,int y)
     label->show();
 }
 
-void ScreenShot::show()
+void ScreenShot::creatActions()
 {
-    QWidget::show();
+
+}
+
+void ScreenShot::creatMenu()
+{
+
+}
+
+void ScreenShot::Shot()
+{
+    QDesktopWidget *desktop = QApplication::desktop();
+    QRect deskRect = desktop->screenGeometry();
+    width = deskRect.width();
+    height = deskRect.height();
+    this->resize(width,height);
+    this ->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
+
+    finish = true;
     setBackground(width,height);
+    rubber =  NULL;
+    origin = end = QPoint(0,0);
+    label = new QLabel("");
+    label->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
+    this->show();
 }
