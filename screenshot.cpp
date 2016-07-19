@@ -1,6 +1,6 @@
 #include "screenshot.h"
 #include "ui_screenshot.h"
-
+#include <QMessageBox>
 
 ScreenShot::ScreenShot()
 {
@@ -10,11 +10,22 @@ ScreenShot::ScreenShot()
     tray->setIcon(icon);
     tray->setToolTip("Ready to shot");
     tray->show();
+
+    creatActions();
+    creatMenu();
+
+    connect(tray,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(iconActivied(QSystemTrayIcon::ActivationReason)));
 }
 
 ScreenShot::~ScreenShot()
 {
     delete ui;
+}
+
+void ScreenShot::closeEvent(QCloseEvent *e)
+{
+    e->ignore();
+    this->hide();
 }
 
 void ScreenShot::keyPressEvent(QKeyEvent *e)
@@ -26,7 +37,10 @@ void ScreenShot::keyPressEvent(QKeyEvent *e)
             Shot();
         }
     }
-
+    if(e->key()==Qt::Key_Escape)
+    {
+        this->hide();
+    }
 }
 
 void ScreenShot::mousePressEvent(QMouseEvent *e)
@@ -70,8 +84,6 @@ void ScreenShot::mouseReleaseEvent(QMouseEvent *e)
             rubber->close();
             label->close();
         }
-
-
 }
 
 void ScreenShot::grabScreen()
@@ -116,12 +128,32 @@ void ScreenShot::setLabel(int w,int h,int x,int y)
 
 void ScreenShot::creatActions()
 {
-
+    quitAction = new QAction("Quit",this);
+    connect(quitAction,SIGNAL(triggered()),qApp,SLOT(quit()));
+    aboutAction = new QAction("About",this);
+    connect(aboutAction,SIGNAL(triggered()),this,SLOT(About()));
 }
 
 void ScreenShot::creatMenu()
 {
+    trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(aboutAction);
+    trayIconMenu->addAction(quitAction);
+    tray->setContextMenu(trayIconMenu);
+}
 
+void ScreenShot::iconActivied(QSystemTrayIcon::ActivationReason reason)
+{
+    switch(reason)
+    {
+    case QSystemTrayIcon::Trigger: Shot();setBackground(width,height);break;
+    default:break;
+    }
+}
+
+void ScreenShot::About()
+{
+    QMessageBox::about(this,"About","this application is for screen shortcut");
 }
 
 void ScreenShot::Shot()

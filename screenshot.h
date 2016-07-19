@@ -11,6 +11,7 @@
 #include <QScreen>
 #include <QSystemTrayIcon>
 #include <QKeyEvent>
+#include <QMenu>
 
 namespace Ui {
 class ScreenShot;
@@ -27,7 +28,7 @@ public:
     void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
     void keyPressEvent(QKeyEvent *e);
-
+    void closeEvent(QCloseEvent *e);
     void setBackground(int w,int h);
     void grabScreen();
     void setLabel(int w,int h,int x,int y);
@@ -48,13 +49,15 @@ private:
 
     QSystemTrayIcon* tray;
     QAction *quitAction;               //退出事件
-    QAction *setAction;                //设置事件
+    QAction *aboutAction;                //设置事件
     QMenu *trayIconMenu;               //托盘图标点击菜单
 
     void creatActions();
     void creatMenu();
 public slots:
     void Shot();
+    void About();
+    void iconActivied(QSystemTrayIcon::ActivationReason reason);
 
 };
 
