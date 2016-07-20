@@ -33,7 +33,7 @@ public:
     void mouseReleaseEvent(QMouseEvent *e);
     void keyPressEvent(QKeyEvent *e);
     void closeEvent(QCloseEvent *e);
-    void setBackground(int w,int h);
+    void setBackground(int w,int h,float n);
 
     void setLabel(int w,int h,int x,int y);
     void setButton(int w,int h,int x,int y);
@@ -66,7 +66,7 @@ private:
 
 
 public slots:
-    void Shot();
+    void Shot(float n);
     void grabScreen();
     void pickColor();
     void makeGif();

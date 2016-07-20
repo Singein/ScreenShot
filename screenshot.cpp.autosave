@@ -196,5 +196,5 @@ void ScreenShot::pickColor()
 
 void ScreenShot::makeGif()
 {
-
+    
 }
