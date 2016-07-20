@@ -144,12 +144,18 @@ void ScreenShot::setButton(int w,int h,int x,int y)
 void ScreenShot::creatActions()
 {
     quitAction = new QAction("Quit",this);
-    connect(quitAction,SIGNAL(triggered()),qApp,SLOT(quit())); 
+    connect(quitAction,SIGNAL(triggered()),qApp,SLOT(quit()));
+    pickAction = new QAction("pick color",this);
+    connect(pickAction,SIGNAL(triggered()),this,SLOT(pickColor()));
+    gifAction = new QAction("make gif",this);
+    connect(gifAction,SIGNAL(triggered()),this,SLOT(makeGif()));
 }
 
 void ScreenShot::creatMenu()
 {
     trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(pickAction);
+    trayIconMenu->addAction(gifAction);
     trayIconMenu->addAction(quitAction);
     tray->setContextMenu(trayIconMenu);
 }
@@ -181,4 +187,14 @@ void ScreenShot::Shot()
     done->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
     connect(done,SIGNAL(clicked()),this,SLOT(grabScreen()));
     this->show();
+}
+
+void ScreenShot::pickColor()
+{
+
+}
+
+void ScreenShot::makeGif()
+{
+
 }

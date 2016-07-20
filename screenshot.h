@@ -56,7 +56,8 @@ private:
 
     QSystemTrayIcon* tray;
     QAction *quitAction;               //退出事件
-    QAction *aboutAction;                //设置事件
+    QAction *pickAction;                //设置事件
+    QAction *gifAction;
     QMenu *trayIconMenu;               //托盘图标点击菜单
 
     void creatActions();
@@ -67,6 +68,8 @@ private:
 public slots:
     void Shot();
     void grabScreen();
+    void pickColor();
+    void makeGif();
     void iconActivied(QSystemTrayIcon::ActivationReason reason);
 
 };
