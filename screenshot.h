@@ -14,6 +14,8 @@
 #include <QMenu>
 #include <QDir>
 #include <QDateTime>
+#include <QPushButton>
+#include <QClipboard>
 
 namespace Ui {
 class ScreenShot;
@@ -32,8 +34,9 @@ public:
     void keyPressEvent(QKeyEvent *e);
     void closeEvent(QCloseEvent *e);
     void setBackground(int w,int h);
-    void grabScreen();
+
     void setLabel(int w,int h,int x,int y);
+    void setButton(int w,int h,int x,int y);
 
 
 private:
@@ -44,6 +47,7 @@ private:
     QPoint end;//鼠标结束位置
     QImage bg;//存贮当前桌面截图
     QLabel *label;//用来框选图片
+    QPushButton *done;//用来确认并生成图片
     int width;//屏幕宽度
     int height;//屏幕高度
     int pw,ph,px,py;
@@ -58,8 +62,11 @@ private:
     void creatActions();
     void creatMenu();
     void pSize();
+
+
 public slots:
     void Shot();
+    void grabScreen();
     void iconActivied(QSystemTrayIcon::ActivationReason reason);
 
 };

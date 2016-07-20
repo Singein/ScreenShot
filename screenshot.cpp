@@ -9,7 +9,6 @@ ScreenShot::ScreenShot()
     icon.addFile(":/new/prefix1/C:/Users/Mercer/Desktop/1468956197_Screenshot.ico");    
     tray->setIcon(icon);
     tray->show();
-
     creatActions();
     creatMenu();
     connect(tray,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
@@ -21,6 +20,14 @@ ScreenShot::~ScreenShot()
     delete ui;
 }
 
+void ScreenShot::pSize()
+{
+    pw = abs(end.x()-origin.x());
+    ph = abs(end.y()-origin.y());
+    px = origin.x()<end.x()?origin.x():end.x();
+    py = origin.y()<end.y()?origin.y():end.y();
+}
+
 void ScreenShot::closeEvent(QCloseEvent *e)
 {
     e->ignore();
@@ -29,24 +36,10 @@ void ScreenShot::closeEvent(QCloseEvent *e)
 
 void ScreenShot::keyPressEvent(QKeyEvent *e)
 {
-    if(e->modifiers()==Qt::AltModifier)
-    {
-        if(e->key()==Qt::Key_S)
-        {
-            Shot();
-        }
-    }
     if(e->key()==Qt::Key_Escape)
     {
         this->hide();
-    }
-    if(e->key()==Qt::Key_Enter)
-    {
-        if(pw*ph!=0)
-        {
-            grabScreen();
-        }
-    }
+    }   
 }
 
 void ScreenShot::mousePressEvent(QMouseEvent *e)
@@ -61,13 +54,7 @@ void ScreenShot::mousePressEvent(QMouseEvent *e)
     }
 }
 
-void ScreenShot::pSize()
-{
-    pw = abs(end.x()-origin.x());
-    ph = abs(end.y()-origin.y());
-    px = origin.x()<end.x()?origin.x():end.x();
-    py = origin.y()<end.y()?origin.y():end.y();
-}
+
 
 void ScreenShot::mouseMoveEvent(QMouseEvent *e)
 {
@@ -77,6 +64,7 @@ void ScreenShot::mouseMoveEvent(QMouseEvent *e)
         pSize();
         rubber->setGeometry(px,py,pw,ph);
         setLabel(pw,ph,px,py);
+        setButton(pw,ph,px,py);
     }
 }
 
@@ -92,6 +80,7 @@ void ScreenShot::mouseReleaseEvent(QMouseEvent *e)
             finish = true;
             rubber->close();
             label->close();
+            done->close();
         }
 }
 
@@ -101,6 +90,13 @@ void ScreenShot::grabScreen()
     QString path = QDir::currentPath()+"/"+QDateTime::currentDateTime().toString("yymmddhhmmss")+".jpg";
     pic.save(path);
     QDesktopServices::openUrl(QUrl(path));
+    QClipboard *b = QApplication::clipboard();
+    b->setImage(pic);
+    done->close();
+    label->close();
+    rubber->close();
+    this->hide();
+
 }
 
 void ScreenShot::setBackground(int w, int h)
@@ -115,9 +111,9 @@ void ScreenShot::setBackground(int w, int h)
     {
         for(int j=0;j<h;j++)
         {
-            r = qRed(bg.pixel(i,j))*0.5;
-            g = qGreen(bg.pixel(i,j))*0.5;
-            b = qBlue(bg.pixel(i,j))*0.5;
+            r = qRed(bg.pixel(i,j))*0.6;
+            g = qGreen(bg.pixel(i,j))*0.6;
+            b = qBlue(bg.pixel(i,j))*0.6;
             bg_grey.setPixel(i,j,qRgb(r,g,b));
         }
     }
@@ -138,6 +134,13 @@ void ScreenShot::setLabel(int w,int h,int x,int y)
     label->show();
 }
 
+void ScreenShot::setButton(int w,int h,int x,int y)
+{
+    QRect rect(done->contentsRect());
+    done->move(QPoint(x+w-rect.width(),y+h-rect.height()));
+    done->show();
+}
+
 void ScreenShot::creatActions()
 {
     quitAction = new QAction("Quit",this);
@@ -155,7 +158,7 @@ void ScreenShot::iconActivied(QSystemTrayIcon::ActivationReason reason)
 {
     switch(reason)
     {
-        case QSystemTrayIcon::Trigger: Shot();setBackground(width,height);break;
+        case QSystemTrayIcon::Trigger: Shot();break;
         default:break;
     }
 }
@@ -168,12 +171,14 @@ void ScreenShot::Shot()
     height = deskRect.height();
     this->resize(width,height);
     this ->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
-
     finish = true;
     setBackground(width,height);
     rubber =  NULL;
     origin = end = QPoint(0,0);
     label = new QLabel("");
+    done = new QPushButton("Done");
     label->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
+    done->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
+    connect(done,SIGNAL(clicked()),this,SLOT(grabScreen()));
     this->show();
 }
