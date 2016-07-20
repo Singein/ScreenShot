@@ -20,7 +20,7 @@ ScreenShot::~ScreenShot()
     delete ui;
 }
 
-void ScreenShot::pSize()
+void ScreenShot::pSize() //获取截图位置坐标
 {
     pw = abs(end.x()-origin.x());
     ph = abs(end.y()-origin.y());
@@ -28,10 +28,12 @@ void ScreenShot::pSize()
     py = origin.y()<end.y()?origin.y():end.y();
 }
 
-void ScreenShot::closeEvent(QCloseEvent *e)
+void ScreenShot::setRubber() //设置截图框
 {
-    e->ignore();
-    this->hide();
+    rubber = new  QRubberBand(QRubberBand::Rectangle,this);
+    rubber->show();
+
+    rubber->setGeometry(origin.x(),origin.y(),0,0);
 }
 
 void ScreenShot::keyPressEvent(QKeyEvent *e)
@@ -55,41 +57,41 @@ void ScreenShot::keyPressEvent(QKeyEvent *e)
 
 }
 
-
 void ScreenShot::mousePressEvent(QMouseEvent *e) //鼠标按下
 {
+    origin = e->pos();
     switch(choice){
     case 0:
-        if(shot==true)
+        if(e->button() == Qt::LeftButton)
         {
-            rubber = new  QRubberBand(QRubberBand::Rectangle,this);
-            rubber->show();
-            origin = e->pos();
-            rubber->setGeometry(origin.x(),origin.y(),0,0);
-            shot = false;
-        }
-        else
-        {
-            rubber->close();
-            label->close();
-            done->close();
-            rubber = new  QRubberBand(QRubberBand::Rectangle,this);
-            rubber->show();
-            origin = e->pos();
-            rubber->setGeometry(origin.x(),origin.y(),0,0);
+            if(shot==true)
+            {
+                setRubber();
+                shot = false;
+            }
+            else
+            {
+                rubber->close();
+                label->close();
+                done->close();
+                setRubber();
+            }
+            quit = false;
         }
         break;
     case 1:
-//        QColorDialog *c;
-//        c->setCurrentColor(color);
+        if(e->button() == Qt::LeftButton)
+        {
+            tray->showMessage("ScreenShot","色值已放入剪贴板",QSystemTrayIcon::Information,1500);
+            colorLabel->close();
+            this->hide();
+        }
         break;
     case 2:
         break;
     }
 
 }
-
-
 
 void ScreenShot::mouseMoveEvent(QMouseEvent *e) //鼠标移动
 {
@@ -134,10 +136,19 @@ void ScreenShot::mouseReleaseEvent(QMouseEvent *e) //鼠标松开
         {
             switch (choice) {
             case 0:
-                shot = true;
-                rubber->close();
-                label->close();
-                done->close();
+                if(quit == false)
+                {
+                    shot = true;
+                    rubber->close();
+                    label->close();
+                    done->close();
+                    quit = true;
+                }
+                else
+                {
+                    this->hide();
+                }
+
                 break;
             case 1:
                 colorLabel->close();
@@ -148,7 +159,7 @@ void ScreenShot::mouseReleaseEvent(QMouseEvent *e) //鼠标松开
         }
 }
 
-void ScreenShot::grabScreen()
+void ScreenShot::grabScreen() //抓取屏幕并截图保存
 {
     QImage pic = bg.copy(px,py,pw,ph);
     QString path = QDir::currentPath()+"/"+QDateTime::currentDateTime().toString("yymmddhhmmss")+".jpg";
@@ -163,7 +174,7 @@ void ScreenShot::grabScreen()
 
 }
 
-void ScreenShot::setBackground(int w, int h,float n)
+void ScreenShot::setBackground(int w, int h,float n) //定格当前屏幕
 {
     QScreen *screen = QGuiApplication::primaryScreen();
 //    screen->grabWindow(0).save("bg.bmp","bmp");
@@ -187,7 +198,7 @@ void ScreenShot::setBackground(int w, int h,float n)
     this->showFullScreen();
 }
 
-void ScreenShot::setLabel(int w,int h,int x,int y)
+void ScreenShot::setLabel(int w,int h,int x,int y) //设置截图时显示尺寸的label
 {
     QString size = QString("%1 x %2      ").arg(w).arg(h);
     label->setText(size);
@@ -199,14 +210,17 @@ void ScreenShot::setLabel(int w,int h,int x,int y)
     label->show();
 }
 
-void ScreenShot::setButton(int w,int h,int x,int y)
+void ScreenShot::setButton(int w,int h,int x,int y) //设置截图时确认保存的按钮
 {
     QRect rect(done->contentsRect());
-    done->move(QPoint(x+w-rect.width(),y+h-rect.height()));
+    if(height-y-h>rect.height())
+        done->move(QPoint(x+w-rect.width(),y+h));
+    else
+        done->move(QPoint(x+w-rect.width(),y+h-rect.height()));
     done->show();
 }
 
-void ScreenShot::creatActions()
+void ScreenShot::creatActions() //创建并关联托盘事件
 {
     quitAction = new QAction("Quit",this);
     connect(quitAction,SIGNAL(triggered()),qApp,SLOT(quit()));
@@ -216,7 +230,7 @@ void ScreenShot::creatActions()
     connect(gifAction,SIGNAL(triggered()),this,SLOT(makeGif()));
 }
 
-void ScreenShot::creatMenu()
+void ScreenShot::creatMenu() //创建托盘菜单
 {
     trayIconMenu = new QMenu(this);
     trayIconMenu->addAction(pickAction);
@@ -225,7 +239,7 @@ void ScreenShot::creatMenu()
     tray->setContextMenu(trayIconMenu);
 }
 
-void ScreenShot::iconActivied(QSystemTrayIcon::ActivationReason reason)
+void ScreenShot::iconActivied(QSystemTrayIcon::ActivationReason reason)//创建托盘单击响应
 {
     switch(reason)
     {
@@ -235,7 +249,7 @@ void ScreenShot::iconActivied(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
-void ScreenShot::Shot(float n)
+void ScreenShot::Shot(float n) //截屏开始，初始化截屏时的控件，参数n为截屏后显示图片与原图的RGB之比
 {
     QDesktopWidget *desktop = QApplication::desktop();
     QRect deskRect = desktop->screenGeometry();
@@ -244,7 +258,8 @@ void ScreenShot::Shot(float n)
     this->setMouseTracking(true);
     this->resize(width,height);
     this ->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
-    shot = reShot = true;
+    shot = true;
+    quit = true;
     setBackground(width,height,n);
     rubber =  NULL;
     origin = end = QPoint(0,0);
@@ -272,7 +287,7 @@ void ScreenShot::Shot(float n)
     this->show();
 }
 
-void ScreenShot::pickColor()
+void ScreenShot::pickColor() //取色
 {
     Shot(1);
     choice = 1; //choice为1为取色
@@ -280,7 +295,7 @@ void ScreenShot::pickColor()
 
 }
 
-void ScreenShot::makeGif()
+void ScreenShot::makeGif() //录GIF
 {
     choice = 2; //choice为2为录gif
 }

@@ -35,9 +35,7 @@ public:
     void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
     void keyPressEvent(QKeyEvent *e);
-    void closeEvent(QCloseEvent *e);
     void setBackground(int w,int h,float n);
-
     void setLabel(int w,int h,int x,int y);
     void setButton(int w,int h,int x,int y);
 
@@ -56,16 +54,18 @@ private:
     int height;//屏幕高度
     int pw,ph,px,py;
     static ScreenShot* instance;
-    bool shot,reShot;
+    bool shot; //用来判断是否重构rubber
+    bool quit; //用来选择右键响应事件
 
     QSystemTrayIcon* tray;
     QAction *quitAction;               //退出事件
-    QAction *pickAction;                //设置事件
-    QAction *gifAction;
+    QAction *pickAction;               //取色
+    QAction *gifAction;                //录gif
     QMenu *trayIconMenu;               //托盘图标点击菜单
 
     void creatActions();
     void creatMenu();
+    void setRubber();
     void pSize();
 
     int choice;
