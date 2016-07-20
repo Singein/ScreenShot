@@ -16,6 +16,9 @@
 #include <QDateTime>
 #include <QPushButton>
 #include <QClipboard>
+#include <QColorDialog>
+#include <QPalette>
+
 
 namespace Ui {
 class ScreenShot;
@@ -46,13 +49,14 @@ private:
     QPoint origin;//鼠标起始位置
     QPoint end;//鼠标结束位置
     QImage bg;//存贮当前桌面截图
-    QLabel *label;//用来框选图片
+    QLabel *label,*colorLabel;//用来框选图片
     QPushButton *done;//用来确认并生成图片
+    QColor color;
     int width;//屏幕宽度
     int height;//屏幕高度
     int pw,ph,px,py;
     static ScreenShot* instance;
-    bool finish;
+    bool shot,reShot;
 
     QSystemTrayIcon* tray;
     QAction *quitAction;               //退出事件
@@ -63,6 +67,8 @@ private:
     void creatActions();
     void creatMenu();
     void pSize();
+
+    int choice;
 
 
 public slots:

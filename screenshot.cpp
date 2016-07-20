@@ -36,51 +36,115 @@ void ScreenShot::closeEvent(QCloseEvent *e)
 
 void ScreenShot::keyPressEvent(QKeyEvent *e)
 {
-    if(e->key()==Qt::Key_Escape)
+    switch(choice)
     {
-        this->hide();
-    }   
-}
-
-void ScreenShot::mousePressEvent(QMouseEvent *e)
-{
-    if(finish==true)
-    {
-        rubber = new  QRubberBand(QRubberBand::Rectangle,this);
-        rubber->show();
-        origin = e->pos();
-        rubber->setGeometry(origin.x(),origin.y(),0,0);
-        finish = false;
+    case 0:
+        if(e->key()==Qt::Key_Escape)
+        {
+            this->hide();
+        }
+        break;
+    case 1:
+        if(e->key()==Qt::Key_Escape)
+        {
+            colorLabel->close();
+            this->hide();
+        }
     }
+
+
 }
 
 
-
-void ScreenShot::mouseMoveEvent(QMouseEvent *e)
+void ScreenShot::mousePressEvent(QMouseEvent *e) //鼠标按下
 {
-    if(e->buttons() & Qt::LeftButton)
-    {
-        end = e->pos();
-        pSize();
-        rubber->setGeometry(px,py,pw,ph);
-        setLabel(pw,ph,px,py);
-        setButton(pw,ph,px,py);
+    switch(choice){
+    case 0:
+        if(shot==true)
+        {
+            rubber = new  QRubberBand(QRubberBand::Rectangle,this);
+            rubber->show();
+            origin = e->pos();
+            rubber->setGeometry(origin.x(),origin.y(),0,0);
+            shot = false;
+        }
+        else
+        {
+            rubber->close();
+            label->close();
+            done->close();
+            rubber = new  QRubberBand(QRubberBand::Rectangle,this);
+            rubber->show();
+            origin = e->pos();
+            rubber->setGeometry(origin.x(),origin.y(),0,0);
+        }
+        break;
+    case 1:
+//        QColorDialog *c;
+//        c->setCurrentColor(color);
+        break;
+    case 2:
+        break;
     }
+
 }
 
-void ScreenShot::mouseReleaseEvent(QMouseEvent *e)
+
+
+void ScreenShot::mouseMoveEvent(QMouseEvent *e) //鼠标移动
+{
+    QPoint p = e->pos();
+    QImage pic = bg;
+
+    switch(choice){
+    case 0:
+        if(e->buttons() & Qt::LeftButton)
+        {
+            end = e->pos();
+            pSize();
+            rubber->setGeometry(px,py,pw,ph);
+            setLabel(pw,ph,px,py);
+            setButton(pw,ph,px,py);
+        }
+        break;
+    case 1:
+
+        color = pic.pixel(p.x(),p.y());
+        colorLabel->setText(tr("R %1    G %2    B %3    ").arg(color.red())
+                           .arg(color.green()).arg(color.blue()));
+
+        colorLabel->move(QPoint(p.x() + 10,p.y() + 10));
+        colorLabel->show();
+        break;
+    case 2:
+          ;
+    }
+
+
+}
+
+void ScreenShot::mouseReleaseEvent(QMouseEvent *e) //鼠标松开
 {
 
         if(e->button()==Qt::LeftButton)
         {
-            end = e->pos();//记录终点坐标  
+
         }
         else if(e->button()==Qt::RightButton)
         {
-            finish = true;
-            rubber->close();
-            label->close();
-            done->close();
+            switch (choice) {
+            case 0:
+                shot = true;
+                rubber->close();
+                label->close();
+                done->close();
+                break;
+            case 1:
+                colorLabel->close();
+                this->hide();
+                break;
+            }
+
         }
 }
 
@@ -120,6 +184,7 @@ void ScreenShot::setBackground(int w, int h,float n)
     QPalette palette;
     palette.setBrush(this->backgroundRole(),QBrush(bg_grey));
     this->setPalette(palette);
+    this->showFullScreen();
 }
 
 void ScreenShot::setLabel(int w,int h,int x,int y)
@@ -164,7 +229,8 @@ void ScreenShot::iconActivied(QSystemTrayIcon::ActivationReason reason)
 {
     switch(reason)
     {
-        case QSystemTrayIcon::Trigger: Shot(0.6);break;
+        case QSystemTrayIcon::Trigger: Shot(0.6);choice = 0;//choice为0为截屏
+        break;
         default:break;
     }
 }
@@ -175,16 +241,33 @@ void ScreenShot::Shot(float n)
     QRect deskRect = desktop->screenGeometry();
     width = deskRect.width();
     height = deskRect.height();
+    this->setMouseTracking(true);
     this->resize(width,height);
     this ->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
-    finish = true;
+    shot = reShot = true;
     setBackground(width,height,n);
     rubber =  NULL;
     origin = end = QPoint(0,0);
     label = new QLabel("");
+    colorLabel = new QLabel("");
+
     done = new QPushButton("Done");
+
+    label->setAttribute(Qt::WA_TranslucentBackground);
+//    colorLabel->setAttribute(Qt::WA_TranslucentBackground);
+    done->setAttribute(Qt::WA_TranslucentBackground);
+
+    QPalette pal;
+    pal.setColor(QPalette::WindowText,Qt::white);
+    label->setPalette(pal);
+//    colorLabel->setPalette(pal);
+    done->setPalette(pal);
+
     label->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
+    colorLabel->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
     done->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
+
+
     connect(done,SIGNAL(clicked()),this,SLOT(grabScreen()));
     this->show();
 }
@@ -192,9 +275,12 @@ void ScreenShot::Shot(float n)
 void ScreenShot::pickColor()
 {
     Shot(1);
+    choice = 1; //choice为1为取色
+
+
 }
 
 void ScreenShot::makeGif()
 {
-
+    choice = 2; //choice为2为录gif
 }
