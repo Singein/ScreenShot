@@ -68,7 +68,9 @@ private:
     void setRubber();
     void pSize();
 
+
     int choice;
+    QFont *font;
 
 
 public slots:
@@ -76,6 +78,7 @@ public slots:
     void grabScreen();
     void pickColor();
     void makeGif();
+    void setColorLabel(int x,int y);
     void iconActivied(QSystemTrayIcon::ActivationReason reason);
 
 };

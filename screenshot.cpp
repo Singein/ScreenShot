@@ -28,6 +28,26 @@ void ScreenShot::pSize() //获取截图位置坐标
     py = origin.y()<end.y()?origin.y():end.y();
 }
 
+void ScreenShot::setColorLabel(int x,int y)//获取取色标签位置
+{
+    colorLabel->setText(tr("   R %1        \n   G %2        \n   B %3        \n   # %4 %5 %6   ")
+          .arg(color.red()).arg(color.green()).arg(color.blue())
+          .arg(QString::number(color.red(),16)).arg(QString::number(color.green(),16)).arg(QString::number(color.blue(),16)));
+    font = new QFont();
+    font->setPointSize(15);
+    colorLabel->setFont(*font);
+    colorLabel->show();
+    QRect rect(colorLabel->contentsRect());
+    if((width-x-20<=rect.width())&&(height-y>rect.height()))
+            colorLabel->move(x-rect.width()-20,y);
+    else if((width-x-20<=rect.width())&&(height-y<=rect.height()))
+            colorLabel->move(x-rect.width()-20,y-rect.height());
+    else if((width-x-20>rect.width())&&(height-y>rect.height()))
+            colorLabel->move(x+20,y);
+    else if((width-x-20>rect.width())&&(height-y<=rect.height()))
+            colorLabel->move(x+20,y-rect.height());
+}
+
 void ScreenShot::setRubber() //设置截图框
 {
     rubber = new  QRubberBand(QRubberBand::Rectangle,this);
@@ -53,8 +73,6 @@ void ScreenShot::keyPressEvent(QKeyEvent *e)
             this->hide();
         }
     }
-
-
 }
 
 void ScreenShot::mousePressEvent(QMouseEvent *e) //鼠标按下
@@ -82,15 +100,21 @@ void ScreenShot::mousePressEvent(QMouseEvent *e) //鼠标按下
     case 1:
         if(e->button() == Qt::LeftButton)
         {
-            tray->showMessage("ScreenShot","色值已放入剪贴板",QSystemTrayIcon::Information,1500);
+            QString str = tr("RGB(%1,%2,%3)  \n# %4 %5 %6   ")
+                    .arg(color.red()).arg(color.green()).arg(color.blue())
+                    .arg(QString::number(color.red(),16))
+                    .arg(QString::number(color.green(),16))
+                    .arg(QString::number(color.blue(),16));
+            tray->showMessage("Copied to the clipboard",str,QSystemTrayIcon::Information,1500);
             colorLabel->close();
+            QClipboard *b = QApplication::clipboard();
+            b->setText(str);
             this->hide();
         }
         break;
     case 2:
         break;
     }
-
 }
 
 void ScreenShot::mouseMoveEvent(QMouseEvent *e) //鼠标移动
@@ -110,13 +134,8 @@ void ScreenShot::mouseMoveEvent(QMouseEvent *e) //鼠标移动
         }
         break;
     case 1:
-
         color = pic.pixel(p.x(),p.y());
-        colorLabel->setText(tr("R %1    G %2    B %3    ").arg(color.red())
-                           .arg(color.green()).arg(color.blue()));
-
-        colorLabel->move(QPoint(p.x() + 10,p.y() + 10));
-        colorLabel->show();
+        setColorLabel(p.x(),p.y());
         break;
     case 2:
           ;
@@ -145,9 +164,7 @@ void ScreenShot::mouseReleaseEvent(QMouseEvent *e) //鼠标松开
                     quit = true;
                 }
                 else
-                {
                     this->hide();
-                }
 
                 break;
             case 1:
@@ -265,9 +282,7 @@ void ScreenShot::Shot(float n) //截屏开始，初始化截屏时的控件，�
     origin = end = QPoint(0,0);
     label = new QLabel("");
     colorLabel = new QLabel("");
-
     done = new QPushButton("Done");
-
     label->setAttribute(Qt::WA_TranslucentBackground);
 //    colorLabel->setAttribute(Qt::WA_TranslucentBackground);
     done->setAttribute(Qt::WA_TranslucentBackground);
