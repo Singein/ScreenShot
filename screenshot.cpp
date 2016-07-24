@@ -6,7 +6,7 @@ ScreenShot::ScreenShot()
 {
     ui->setupUi(this);
     tray = new QSystemTrayIcon;
-    icon.addFile(":/new/prefix1/C:/Users/Mercer/Desktop/1468956197_Screenshot.ico");    
+    icon.addFile(":/new/prefix1/C:/Users/Fuerm/Desktop/1468956197_Screenshot.ico");
     tray->setIcon(icon);
     tray->show();
     creatActions();
@@ -243,15 +243,15 @@ void ScreenShot::creatActions() //创建并关联托盘事件
     connect(quitAction,SIGNAL(triggered()),qApp,SLOT(quit()));
     pickAction = new QAction("pick color",this);
     connect(pickAction,SIGNAL(triggered()),this,SLOT(pickColor()));
-    gifAction = new QAction("make gif",this);
-    connect(gifAction,SIGNAL(triggered()),this,SLOT(makeGif()));
+//    gifAction = new QAction("make gif",this);
+//    connect(gifAction,SIGNAL(triggered()),this,SLOT(makeGif()));
 }
 
 void ScreenShot::creatMenu() //创建托盘菜单
 {
     trayIconMenu = new QMenu(this);
     trayIconMenu->addAction(pickAction);
-    trayIconMenu->addAction(gifAction);
+//    trayIconMenu->addAction(gifAction);
     trayIconMenu->addAction(quitAction);
     tray->setContextMenu(trayIconMenu);
 }
@@ -310,7 +310,7 @@ void ScreenShot::pickColor() //取色
 
 }
 
-void ScreenShot::makeGif() //录GIF
-{
-    choice = 2; //choice为2为录gif
-}
+//void ScreenShot::makeGif() //录GIF
+//{
+//    choice = 2; //choice为2为录gif
+//}

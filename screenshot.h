@@ -60,7 +60,7 @@ private:
     QSystemTrayIcon* tray;
     QAction *quitAction;               //退出事件
     QAction *pickAction;               //取色
-    QAction *gifAction;                //录gif
+//    QAction *gifAction;               //录gif
     QMenu *trayIconMenu;               //托盘图标点击菜单
 
     void creatActions();
@@ -77,7 +77,7 @@ public slots:
     void Shot(float n);
     void grabScreen();
     void pickColor();
-    void makeGif();
+//    void makeGif();
     void setColorLabel(int x,int y);
     void iconActivied(QSystemTrayIcon::ActivationReason reason);
 
