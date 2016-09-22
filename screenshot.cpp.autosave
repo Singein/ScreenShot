@@ -306,8 +306,6 @@ void ScreenShot::pickColor() //取色
 {
     Shot(1);
     choice = 1; //choice为1为取色
-
-
 }
 
 //void ScreenShot::makeGif() //录GIF
