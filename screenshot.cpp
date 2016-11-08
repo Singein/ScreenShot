@@ -1,12 +1,13 @@
 #include "screenshot.h"
 #include "ui_screenshot.h"
 #include <QMessageBox>
+#include <QThread>
 
 ScreenShot::ScreenShot()
 {
     ui->setupUi(this);
     tray = new QSystemTrayIcon;
-    icon.addFile(":/new/prefix1/1473075997_88.svg");
+    icon.addFile(":/new/prefix1/ic_crop_free_white_48dp.png");
     tray->setIcon(icon);
     tray->show();
     creatActions();
@@ -36,6 +37,8 @@ void ScreenShot::setColorLabel(int x,int y)//获取取色标签位置
     font = new QFont();
     font->setPointSize(15);
     colorLabel->setFont(*font);
+    colorLabel->setMaximumSize(150,120);
+    colorLabel->setMinimumSize(150,120);
     colorLabel->show();
     QRect rect(colorLabel->contentsRect());
     if((width-x-20<=rect.width())&&(height-y>rect.height()))
@@ -217,7 +220,7 @@ void ScreenShot::setBackground(int w, int h,float n) //定格当前屏幕
 
 void ScreenShot::setLabel(int w,int h,int x,int y) //设置截图时显示尺寸的label
 {
-    QString size = QString("%1 x %2      ").arg(w).arg(h);
+    QString size = QString("%1         x %2          ").arg(w).arg(h);
     label->setText(size);
     QRect rect(label->contentsRect());
     if(y>rect.height())
@@ -243,6 +246,8 @@ void ScreenShot::creatActions() //创建并关联托盘事件
     connect(quitAction,SIGNAL(triggered()),qApp,SLOT(quit()));
     pickAction = new QAction("pick color",this);
     connect(pickAction,SIGNAL(triggered()),this,SLOT(pickColor()));
+    shotAction = new QAction("screenShot",this);
+    connect(shotAction,SIGNAL(triggered()),this,SLOT(shotSlot()));
 //    gifAction = new QAction("make gif",this);
 //    connect(gifAction,SIGNAL(triggered()),this,SLOT(makeGif()));
 }
@@ -250,6 +255,7 @@ void ScreenShot::creatActions() //创建并关联托盘事件
 void ScreenShot::creatMenu() //创建托盘菜单
 {
     trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(shotAction);
     trayIconMenu->addAction(pickAction);
 //    trayIconMenu->addAction(gifAction);
     trayIconMenu->addAction(quitAction);
@@ -304,10 +310,17 @@ void ScreenShot::Shot(float n) //截屏开始，初始化截屏时的控件，�
 
 void ScreenShot::pickColor() //取色
 {
+    QThread::msleep(70);
     Shot(1);
     choice = 1; //choice为1为取色
+}
 
+void ScreenShot::shotSlot()
+{
+    QThread::msleep(70);
 
+    Shot(0.6);
+    choice = 0;
 }
 
 //void ScreenShot::makeGif() //录GIF
