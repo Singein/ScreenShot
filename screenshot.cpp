@@ -182,7 +182,7 @@ void ScreenShot::mouseReleaseEvent(QMouseEvent *e) //鼠标松开
 void ScreenShot::grabScreen() //抓取屏幕并截图保存
 {
     QImage pic = bg.copy(px,py,pw,ph);
-    QString path = QDir::currentPath()+"/"+QDateTime::currentDateTime().toString("yymmddhhmmss")+".jpg";
+    QString path = QDir::homePath()+"/图片/ScreenShot/"+QDateTime::currentDateTime().toString("yymmddhhmmss")+".jpg";
     pic.save(path);
     QDesktopServices::openUrl(QUrl(path));
     QClipboard *b = QApplication::clipboard();
@@ -220,7 +220,7 @@ void ScreenShot::setBackground(int w, int h,float n) //定格当前屏幕
 
 void ScreenShot::setLabel(int w,int h,int x,int y) //设置截图时显示尺寸的label
 {
-    QString size = QString("%1         x %2          ").arg(w).arg(h);
+    QString size = QString("%1  x %2                                  ").arg(w).arg(h);
     label->setText(size);
     QRect rect(label->contentsRect());
     if(y>rect.height())
@@ -310,14 +310,14 @@ void ScreenShot::Shot(float n) //截屏开始，初始化截屏时的控件，�
 
 void ScreenShot::pickColor() //取色
 {
-    QThread::msleep(70);
+    QThread::msleep(100);
     Shot(1);
     choice = 1; //choice为1为取色
 }
 
 void ScreenShot::shotSlot()
 {
-    QThread::msleep(70);
+    QThread::msleep(100);
 
     Shot(0.6);
     choice = 0;
